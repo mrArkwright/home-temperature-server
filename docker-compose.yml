@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+
+  influxdb:
+    image: influxdb:1.8
+    restart: always
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+
+  datalogd:
+    build: datalogd
+    restart: always
+    devices:
+      - "/dev/gpiomem:/dev/gpiomem"
+
+  grafana:
+    image: grafana/grafana-oss:8.5.5
+    restart: always
+    ports:
+      - "80:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+volumes:
+
+  grafana-data:
+    external: true
+
+  influxdb-data:
+    external: true
