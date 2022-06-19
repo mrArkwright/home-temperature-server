@@ -3,16 +3,24 @@ version: "3.7"
 services:
 
   influxdb:
-    image: influxdb:1.8
+    image: influxdb:2.2-alpine
     restart: always
     volumes:
-      - influxdb-data:/var/lib/influxdb
+      - influxdb:/var/lib/influxdb2
+    ports:
+      - "8086:8086"
 
-  datalogd:
-    build: datalogd
+  data-logger:
+    build: data-logger
     restart: always
     devices:
       - "/dev/gpiomem:/dev/gpiomem"
+    environment:
+      - INFLUXDB_HOST=influxdb
+      - INFLUXDB_PORT=8086
+      - INFLUXDB_ORG=$INFLUXDB_ORG
+      - INFLUXDB_TOKEN=$INFLUXDB_TOKEN
+      - INFLUXDB_BUCKET=$INFLUXDB_BUCKET
 
   grafana:
     image: grafana/grafana-oss:8.5.5
@@ -20,12 +28,12 @@ services:
     ports:
       - "80:3000"
     volumes:
-      - grafana-data:/var/lib/grafana
+      - grafana:/var/lib/grafana
 
 volumes:
 
-  grafana-data:
+  grafana:
     external: true
 
-  influxdb-data:
+  influxdb:
     external: true
