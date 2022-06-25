@@ -55,7 +55,7 @@ from(bucket: "<bucket>")
   |> filter(fn: (r) => r._field == "temperature")
 ```
 
-Example query with smoothing:
+Example query with smoothing and extreme value filtering:
 ```
 maxDuration = (a, b) => {
   aInt = int(v: a)
@@ -68,6 +68,7 @@ interval = maxDuration(a: $__interval, b: 5s)
 from(bucket: "<bucket>")
   |> range(start: v.timeRangeStart, stop:v.timeRangeStop)
   |> filter(fn: (r) => r._field == "temperature")
+  |> filter(fn: (r) => r._value > 0.0 and r._value < 70.0)
   |> aggregateWindow(every: interval, fn: mean, createEmpty: true)
   |> timedMovingAverage(every: duration(v: int(v: interval) * 3), period: duration(v: int(v: interval) * 6))
 ```
