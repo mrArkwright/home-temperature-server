@@ -6,7 +6,13 @@ Logs data in an [InfluxDB](https://www.influxdata.com) with a [Grafana](https://
 
 ### Hardware Setup
 
-Connect DHT22-Sensor to Pin D4 of your RaspberryPi.
+Connect BME280-Sensor to I2C port of your RaspberryPi.
+
+### Enable I2C port
+
+Add `dtparam=i2c_arm=on` to _/boot/config.txt_.
+
+Enable I2C kernel module loading with `sudo raspi-config` → _Interface Options_ → _I2C_
 
 ### Create Volumes
 

@@ -2,8 +2,8 @@ import os
 import time
 from datetime import datetime
 import logging
-import board
-import adafruit_dht
+import smbus2
+import bme280
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
@@ -12,8 +12,12 @@ def main():
     loglevel = os.environ.get("LOGLEVEL", "INFO")
     set_loglevel(loglevel)
 
-    dht_pin = board.D4
-    dht_device = adafruit_dht.DHT22(dht_pin)
+    bme280_smbus_port = 1
+    bme280_smbus_address = 0x76
+
+    bme280_smbus = smbus2.SMBus(bme280_smbus_port)
+
+    bme280.load_calibration_params(bme280_smbus, bme280_smbus_address)
 
     influxdb_host = os.environ["INFLUXDB_HOST"]
     influxdb_port = os.environ["INFLUXDB_PORT"]
@@ -26,7 +30,7 @@ def main():
 
     logging.info("data-logger started")
 
-    data_log_loop(dht_device, influx_db_write_api, influxdb_bucket, influxdb_org)
+    data_log_loop(bme280_smbus, bme280_smbus_address, influx_db_write_api, influxdb_bucket, influxdb_org)
 
 
 def set_loglevel(loglevel):
@@ -38,11 +42,13 @@ def set_loglevel(loglevel):
     logging.basicConfig(level=loglevel1)
 
 
-def data_log_loop(dht_device, influx_db_write_api, influxdb_bucket, influxdb_org):
+def data_log_loop(bme280_smbus, bme280_smbus_address, influx_db_write_api, influxdb_bucket, influxdb_org):
     while True:
         try:
-            temperature = dht_device.temperature
-            humidity = dht_device.humidity
+            bme280_data = bme280.sample(bme280_smbus, bme280_smbus_address)
+            temperature = bme280_data.temperature
+            humidity = bme280_data.humidity
+            #pressure = bme280_data.pressure
         except RuntimeError as error:
             logging.debug(f"error reading sensor: {error}")
             continue

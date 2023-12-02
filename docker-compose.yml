@@ -14,7 +14,7 @@ services:
     build: data-logger
     restart: always
     devices:
-      - "/dev/gpiomem:/dev/gpiomem"
+      - "/dev/i2c-1:/dev/i2c-1"
     environment:
       - INFLUXDB_HOST=influxdb
       - INFLUXDB_PORT=8086
