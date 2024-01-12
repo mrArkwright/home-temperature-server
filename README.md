@@ -4,6 +4,14 @@ Logs data in an [InfluxDB](https://www.influxdata.com) with a [Grafana](https://
 
 ## Setup
 
+### Generate SSL Certificate
+
+In _nginx/cert_
+
+```
+openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 -keyout private_key.pem -out certificate.pem
+```
+
 ### Hardware Setup
 
 Connect BME280-Sensor to I2C port of your RaspberryPi.
